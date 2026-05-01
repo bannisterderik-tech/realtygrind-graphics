@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RealtyGrind — 30-Day Social Graphics Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#08001a;color:#e2d9f3;font-family:'Inter',sans-serif;min-height:100vh}
+
+/* ── App Layout ── */
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+.sidebar{background:#0d0024;border-right:1px solid rgba(124,58,237,.15);overflow-y:auto;padding:20px 0}
+.sidebar-header{padding:0 20px 20px;border-bottom:1px solid rgba(124,58,237,.1);margin-bottom:12px}
+.sidebar-logo{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sidebar-logo svg{width:24px;height:24px;color:#a78bfa}
+.sidebar-logo span{font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;color:#fff}
+.sidebar-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7c3aed;margin-bottom:4px}
+.sidebar-sub{font-size:11px;color:rgba(167,139,250,.5)}
+
+.day-list{padding:0 8px}
+.day-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;cursor:pointer;transition:all .15s;font-size:12px;color:rgba(226,217,243,.6);border:1px solid transparent}
+.day-item:hover{background:rgba(124,58,237,.08);color:#e2d9f3}
+.day-item.active{background:rgba(124,58,237,.15);color:#fff;border-color:rgba(124,58,237,.3)}
+.day-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;background:rgba(124,58,237,.1);color:#a78bfa;flex-shrink:0}
+.day-item.active .day-num{background:#7c3aed;color:#fff}
+.day-label{flex:1;line-height:1.3}
+.day-label strong{display:block;font-weight:600;font-size:12px}
+.day-label small{font-size:10px;color:rgba(167,139,250,.4)}
+.day-item.active .day-label small{color:rgba(167,139,250,.7)}
+
+.week-divider{padding:16px 20px 6px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(124,58,237,.4)}
+
+/* ── Main Content ── */
+.main{padding:28px 36px;overflow-y:auto}
+.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.main-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:22px;color:#fff}
+
+/* Size tabs */
+.size-tabs{display:flex;gap:6px;background:rgba(124,58,237,.08);padding:4px;border-radius:12px}
+.size-tab{padding:7px 16px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;color:rgba(167,139,250,.6);border:none;background:none}
+.size-tab:hover{color:#a78bfa}
+.size-tab.active{background:#7c3aed;color:#fff;box-shadow:0 2px 12px rgba(124,58,237,.4)}
+
+/* Preview area */
+.preview-wrapper{display:flex;justify-content:center;padding:20px 0}
+.preview-container{position:relative;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.5),0 0 0 1px rgba(124,58,237,.15)}
+
+/* Controls */
+.controls{display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap}
+.dl-btn{padding:10px 24px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;border:none;font-family:'Inter',sans-serif}
+.dl-btn.primary{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.4)}
+.dl-btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(124,58,237,.5)}
+.dl-btn.secondary{background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.2)}
+.dl-btn.secondary:hover{background:rgba(124,58,237,.18)}
+
+/* Caption area */
+.caption-section{margin-top:28px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:20px 24px}
+.caption-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7c3aed;margin-bottom:8px}
+.caption-text{font-size:13px;line-height:1.8;color:rgba(226,217,243,.7)}
+.hashtags{margin-top:10px;font-size:12px;color:#7c3aed;font-weight:600}
+.copy-btn{margin-top:10px;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.2);font-family:'Inter',sans-serif}
+.copy-btn:hover{background:rgba(124,58,237,.2)}
+
+/* Download all */
+.dl-all-section{margin-top:24px;text-align:center}
+.dl-all-btn{padding:14px 36px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#3b0764,#7c3aed);color:#fff;border:2px solid rgba(167,139,250,.3);box-shadow:0 8px 32px rgba(59,7,100,.5);font-family:'Inter',sans-serif;transition:all .15s}
+.dl-all-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(59,7,100,.6)}
+.dl-all-btn:disabled{opacity:.5;cursor:wait;transform:none}
+
+/* Progress bar */
+.progress-bar{margin-top:12px;height:4px;background:rgba(124,58,237,.15);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:4px;transition:width .3s}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;background:#7c3aed;color:#fff;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:1000;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span>RealtyGrind</span>
+    </div>
+    <div class="sidebar-title">30-Day Graphics</div>
+    <div class="sidebar-sub">Select a day to preview & export</div>
+  </div>
+  <div class="day-list" id="dayList"></div>
+</aside>
+<main class="main" id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Hidden render target -->
+<div id="renderTarget" style="position:fixed;left:-9999px;top:0;z-index:-1"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// RealtyGrind 30-Day Social Graphics Generator
+// Purple monochromatic · No gold · SVG Lucide house logo
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── House Logo SVG (Lucide Home icon) ────────────────────────────────
+const LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`
+
+// ── Unsplash Images (royalty-free) ───────────────────────────────────
+const IMAGES = [
+  'photo-1600596542815-ffad4c1539a9', // modern white house
+  'photo-1600585154340-be6161a56a0c', // luxury twilight
+  'photo-1564013799919-ab600027ffc6', // contemporary glass
+  'photo-1512917774080-9991f1c4c750', // modern architecture pool
+  'photo-1570129477492-45c003edd2be', // suburban home
+  'photo-1613490493576-7fde63acd811', // villa with pool
+  'photo-1580587771525-78b9dba3b914', // grand mansion
+  'photo-1605276374104-dee2a0ed3cd6', // craftsman house
+  'photo-1600047509807-ba8f99d2cdde', // modern facade
+  'photo-1600566753190-17f0baa2a6c0', // bright living room
+  'photo-1600607687939-ce8a6c25118c', // modern living room
+  'photo-1600210492486-724fe5c67fb0', // house at dusk
+  'photo-1600573472592-401b489a3cdc', // modern kitchen
+  'photo-1602941525421-8f8b81d3edbb', // house aerial
+  'photo-1600585152220-90363fe7e115', // townhomes
+]
+function imgUrl(idx, w) {
+  return `https://images.unsplash.com/${IMAGES[idx % IMAGES.length]}?w=${w||1200}&h=${Math.round((w||1200)*0.75)}&fit=crop&q=80`
+}
+
+// ── Sizes ────────────────────────────────────────────────────────────
+const SIZES = {
+  square:    { w: 1080, h: 1080, label: 'Instagram Feed (1080×1080)' },
+  story:     { w: 1080, h: 1920, label: 'Stories / Reels (1080×1920)' },
+  landscape: { w: 1200, h: 628,  label: 'Facebook / LinkedIn (1200×628)' },
+  twitter:   { w: 1600, h: 900,  label: 'Twitter / X (1600×900)' },
+}
+
+// ── 30 Days Content Data ─────────────────────────────────────────────
+const DAYS = [
+  // ── WEEK 1: INTRODUCE ──
+  { day:1, week:1, layout:'hero', badge:'INTRODUCING', headline:'The Agentic AI OS\nfor Real Estate', sub:'One platform. AI that actually does the work.', img:0,
+    caption:'Meet RealtyGrind — the first Agentic AI Operating System built exclusively for real estate professionals. While other platforms give you a database and make you do all the work, our AI agents actually execute. Writing your emails. Planning your week. Generating presentations. Running your marketing. All from one login.',
+    tags:'#RealtyGrind #RealEstateAI #AgenticAI #RealEstateTech #PropTech' },
+
+  { day:2, week:1, layout:'split', badge:'THE PROBLEM', headline:'Stop Managing\n8+ Tools', sub:'CRM · Marketing · Presentations · AI coaching · Voice · Automation\nOne platform replaces them all.', img:1,
+    caption:'The average real estate agent uses 8-12 different tools and spends $500-$2,000/month on subscriptions. Most of that time? Copying data between systems that don\'t talk to each other. RealtyGrind replaces them all with one platform powered by agentic AI.',
+    tags:'#RealEstateAgent #ProductivityHack #TechStack #SaaS #SaveMoney' },
+
+  { day:3, week:1, layout:'hero', badge:'FEATURE SPOTLIGHT', headline:'Meet CoachAI™', sub:'Your AI that knows your actual business.\nConnected to your CRM via MCP — in real-time.', img:9,
+    caption:'CoachAI™ isn\'t another chatbot. It\'s connected directly to your CRM via MCP. Ask it "who should I call today?" — it pulls your actual leads. "Write a follow-up for James about the showing" — it knows who James is, what property he saw, and what to say.',
+    tags:'#CoachAI #RealEstateAI #CRM #FollowUpBoss #GoHighLevel #AICoaching' },
+
+  { day:4, week:1, layout:'dark', badge:'FEATURE SPOTLIGHT', headline:'Your AI\nSales Machine', sub:'AI SDR — Outbound calls, texts, and follow-ups running 24/7 on complete autopilot.', img:3,
+    caption:'Hate cold calling? Your AI SDR handles it. Personalized SMS sequences. AI-powered outbound calls. Inbound text handling. Lead scoring that ranks by engagement. Like hiring a full-time sales rep that never calls in sick.',
+    tags:'#AISDR #SalesAutomation #LeadGeneration #RealEstateSales #ColdCalling' },
+
+  { day:5, week:1, layout:'card', badge:'FEATURE SPOTLIGHT', headline:'Your Entire Operation.\nOne Dashboard.', sub:'Lead Watch — Real-time CRM intelligence with drag-and-drop pipeline management.', img:4,
+    caption:'Stop asking "where\'s that deal at?" Lead Watch syncs your entire CRM into a real-time command center. Every lead. Every pipeline stage. Every activity. Drag-and-drop management, bulk actions, engagement timelines.',
+    tags:'#LeadWatch #CRM #Pipeline #RealEstateTeam #Dashboard #LeadManagement' },
+
+  { day:6, week:1, layout:'list', badge:'AI TIPS', headline:'3 Signs You Need AI\nin Your Business', items:['You spend more time on admin than selling','Leads are falling through the cracks','You\'re paying for 5+ tools that don\'t connect'], img:5,
+    caption:'If any of these sound familiar, you\'re leaving money on the table every month. AI isn\'t coming — it\'s here. The agents who adopt it first will dominate. Which one are you going to be?',
+    tags:'#AITips #RealEstateSuccess #AgentLife #PropTech #WorkSmarter' },
+
+  { day:7, week:1, layout:'gradient', badge:'GET STARTED', headline:'Your AI Team\nStarts Today', sub:'3-day free trial · No credit card · Cancel anytime', img:6,
+    caption:'Ready to stop grinding and start growing? RealtyGrind gives you an entire AI-powered back office from one login. Start your free trial and see the difference in 24 hours. → realtygrind.co',
+    tags:'#RealtyGrind #FreeTrial #RealEstateTech #StartToday #AIForAgents' },
+
+  // ── WEEK 2: PRODUCTIVITY ──
+  { day:8, week:2, layout:'hero', badge:'FEATURE SPOTLIGHT', headline:'Your Daily\nBattle Plan', sub:'The Briefing AI™ reads your CRM and calendar every morning — tells you exactly what to do.', img:7,
+    caption:'Wake up. Open RealtyGrind. Know exactly what to do. The Briefing AI™ pulls live data from your CRM and calendar, then delivers a priority-ranked action plan. Hot leads. Upcoming deadlines. Today\'s appointments. No more guessing.',
+    tags:'#BriefingAI #MorningRoutine #Productivity #RealEstateAgent #DailyBriefing' },
+
+  { day:9, week:2, layout:'split', badge:'FEATURE SPOTLIGHT', headline:'AI Plans Your\nEntire Week', sub:'WeekAI™ reads your CRM, calendar, and pipeline — then builds your entire schedule automatically.', img:8,
+    caption:'Time-blocking is the secret weapon of top producers. But who has time to plan the plan? WeekAI™ reads your leads, appointments, and goals — then fills every gap with exactly what you should be doing. One button. Done.',
+    tags:'#WeekAI #TimeBlocking #ProductivityHack #RealEstateProductivity' },
+
+  { day:10, week:2, layout:'dark', badge:'FEATURE SPOTLIGHT', headline:'Set It. Forget It.\nClose More.', sub:'Visual workflow automation builder with trigger-based actions that run forever.', img:10,
+    caption:'New lead from Zillow? Auto: send welcome text → create task → add to drip → notify agent → update CRM. Build it once. It runs forever. That\'s 10 minutes saved per lead × hundreds of leads per year.',
+    tags:'#Automation #Workflows #RealEstateEfficiency #NoCode #LeadRouting' },
+
+  { day:11, week:2, layout:'card', badge:'FEATURE SPOTLIGHT', headline:'Follow-Up\non Autopilot', sub:'Multi-touch drip campaigns across email, SMS, and direct mail — with AI-written content.', img:11,
+    caption:'80% of deals close after the 5th follow-up. Most agents give up after 2. RealtyGrind\'s drip campaigns run automated sequences across every channel — with AI-written content personalized to each lead.',
+    tags:'#DripCampaigns #FollowUp #LeadNurturing #EmailMarketing #SMS' },
+
+  { day:12, week:2, layout:'list', badge:'PRO TIPS', headline:'5 Follow-Ups to\nAutomate Today', items:['New lead welcome sequence','Post-showing check-in','Anniversary reminders','Market update emails','Listing status changes'], img:12,
+    caption:'If you\'re still manually following up with every lead, these 5 touchpoints should be running on autopilot right now. Set them up once and they work forever. Which one are you missing?',
+    tags:'#AutomationTips #RealEstateHacks #AgentLife #FollowUpStrategy' },
+
+  { day:13, week:2, layout:'gradient', badge:'BY THE NUMBERS', headline:'15+ Hours\nSaved Every Week', sub:'AI-powered agents report dramatic time savings\non admin, follow-ups, and content creation.\n\n780 hours/year · 97 full workdays back', img:2,
+    caption:'15 hours/week × 52 weeks = 780 hours/year. That\'s 97 full workdays you get back. What would you do with 97 extra days? More showings. More closings. More life.',
+    tags:'#AIStats #TimeSavings #Productivity #WorkSmarter #ROI' },
+
+  { day:14, week:2, layout:'hero', badge:'TAKE ACTION', headline:'Your AI Team\nis Waiting', sub:'CoachAI · WeekAI · DeckAI · ValueAI · PlannerAI · GraphicAI\nAll yours. One platform.', img:6,
+    caption:'Top-producing agents are already using AI to crush their goals. CoachAI plans conversations. WeekAI plans schedules. DeckAI builds presentations. Your entire business, powered by agentic AI. → realtygrind.co',
+    tags:'#RealtyGrind #StartToday #RealEstateTech #AITeam #ClosingDeals' },
+
+  // ── WEEK 3: MARKETING ──
+  { day:15, week:3, layout:'split', badge:'FEATURE SPOTLIGHT', headline:'Win Every Listing\nAppointment', sub:'DeckAI™ — AI listing presentations and buyer decks in under 2 minutes. 4 style presets.', img:0,
+    caption:'Listing appointment in 30 minutes? DeckAI™ generates a polished multi-slide presentation with the seller\'s property data, recent comps, your track record, and pricing strategy. The agent with the better deck wins.',
+    tags:'#DeckAI #ListingPresentation #WinListings #RealEstateMarketing' },
+
+  { day:16, week:3, layout:'card', badge:'FEATURE SPOTLIGHT', headline:'Unlimited\nBranded Graphics', sub:'Social Graphics Designer — Just Listed · Just Sold · Open House · Market Update · Tips · Testimonials', img:1,
+    caption:'Stop paying designers. Stop spending hours in Canva. Create professional branded graphics for every occasion. Your colors. Your branding. Unlimited. Multiple sizes for every platform. Done in seconds.',
+    tags:'#GraphicAI #SocialMedia #RealEstateMarketing #BrandedContent' },
+
+  { day:17, week:3, layout:'dark', badge:'FEATURE SPOTLIGHT', headline:'Your Entire Month\nof Content. One Click.', sub:'PlannerAI™ + Social Planner — 30-day social media strategies from your listings and market data.', img:2,
+    caption:'PlannerAI™ builds a complete 30-day content strategy from your actual listings and market data. AI-written captions, hashtags, posting schedule. Just post.',
+    tags:'#PlannerAI #ContentCalendar #SocialMediaStrategy #30DayPlan' },
+
+  { day:18, week:3, layout:'hero', badge:'FEATURE SPOTLIGHT', headline:'Listing Descriptions\nThat Sell', sub:'ListingCraft AI™ writes MLS-optimized descriptions in seconds.\nProfessional · Luxury · Casual · Bold', img:9,
+    caption:'ListingCraft AI™ writes high-converting descriptions — professional, luxury, casual, or bold tones. MLS-optimized lengths. Pulls from your CRM data. Professional copy in 10 seconds.',
+    tags:'#ListingCraft #MLSListing #Copywriting #AIContent #RealEstateWriting' },
+
+  { day:19, week:3, layout:'split', badge:'FEATURE SPOTLIGHT', headline:'Capture Leads\non Autopilot', sub:'Landing Page Builder — 20+ drag-and-drop blocks · Custom domains · Built-in lead capture forms.', img:4,
+    caption:'Running Facebook ads but sending traffic to your Zillow profile? Build custom property pages and lead capture pages in minutes. Mortgage calculators, contact forms, video embeds. Every lead auto-captured to your CRM.',
+    tags:'#LandingPages #LeadCapture #FacebookAds #RealEstateMarketing' },
+
+  { day:20, week:3, layout:'list', badge:'PRO TIPS', headline:'5 AI Marketing Hacks\nfor Agents', items:['Auto-generate listing descriptions','AI social media content calendars','Personalized multi-channel drips','AI-written direct mail postcards','One-click branded graphics'], img:5,
+    caption:'The top 1% of agents don\'t work harder — they work smarter. These 5 AI marketing hacks save 10+ hours every week. Every single one is built into RealtyGrind.',
+    tags:'#MarketingHacks #AIMarketing #RealEstateAgent #ContentCreation' },
+
+  { day:21, week:3, layout:'card', badge:'FEATURE SPOTLIGHT', headline:'AI-Powered\nPhysical Marketing', sub:'Direct Mail Wizard — AI writes the copy · Lob prints and mails · Postcards at their door in days.', img:7,
+    caption:'Digital is noisy. A personalized postcard in someone\'s mailbox cuts through. AI writes the copy. You pick the template. Select recipients from CRM. Hit send. No print shop. No stamps.',
+    tags:'#DirectMail #Postcards #FarmingCampaign #PhysicalMarketing' },
+
+  // ── WEEK 4: ADVANCED & CLOSING ──
+  { day:22, week:4, layout:'hero', badge:'FEATURE SPOTLIGHT', headline:'AI CMA Reports\nin 2 Minutes', sub:'ValueAI™ — AI-powered comp scoring, price adjustments, and client-ready market analysis reports.', img:0,
+    caption:'ValueAI™ generates professional CMA reports with AI-powered comp scoring, price adjustments, and market analysis. Enter the property. AI finds comps, scores them, suggests a price range. Client-ready.',
+    tags:'#ValueAI #CMA #PricingStrategy #ListingAppointment #MarketAnalysis' },
+
+  { day:23, week:4, layout:'dark', badge:'FEATURE SPOTLIGHT', headline:'Never Miss\nAnother Lead', sub:'AI Voice Receptionist · Browser Dialer · Call Coaching · Every call logged and captured automatically.', img:3,
+    caption:'Your phone rings while you\'re in a showing. The lead goes to voicemail. They call someone else. Not anymore. AI answers and qualifies every inbound call. Browser dialer lets you click to call. Every opportunity saved.',
+    tags:'#VoiceSuite #AIReceptionist #ClickToCall #NeverMissALead' },
+
+  { day:24, week:4, layout:'split', badge:'FEATURE SPOTLIGHT', headline:'Scale Without\nAdding Headcount', sub:'Team tools — Daily standups · InsightAI™ coaching · Accountability groups · Shared boards.', img:8,
+    caption:'Daily standup feeds. Per-agent coaching notes with AI suggestions. Accountability groups. Shared listings and buyer boards. Give every agent their own AI — all connected to the team CRM.',
+    tags:'#TeamManagement #Brokerage #Leadership #RealEstateTeam #Scale' },
+
+  { day:25, week:4, layout:'card', badge:'FEATURE SPOTLIGHT', headline:'AI Content\nThat Works 24/7', sub:'AI Chatbots on your website · AI Blog Writer for SEO · AI Guides for client education.', img:11,
+    caption:'Embed AI chatbots that capture leads automatically. Generate SEO blog posts with AI. Create professional buyer and seller guides. Content that positions you as the expert — generated in minutes, working forever.',
+    tags:'#AIChatbot #BlogWriter #SEO #ContentMarketing #LeadCapture' },
+
+  { day:26, week:4, layout:'gradient', badge:'INSIGHT', headline:'Why Top Producers\nChoose Agentic AI', sub:'It\'s not about replacing agents.\nIt\'s about replacing busywork.\n\nRelationships + Closings > Data entry + Templates', img:13,
+    caption:'The best agents spend time on relationships and closings — and let AI handle everything else. That\'s the difference between working IN your business and ON your business. Agentic AI makes that possible.',
+    tags:'#TopProducer #AgenticAI #WorkSmarter #RealEstateSuccess' },
+
+  { day:27, week:4, layout:'hero', badge:'BY THE NUMBERS', headline:'Replace $2,000+/mo\nin Software', sub:'CRM + AI + Marketing + Presentations + Voice + Landing Pages + Automation\nStarting at $49/mo.', img:6,
+    caption:'CRM ($300) + Design tools ($30) + Email ($50) + AI ($200) + Presentations ($30) + Coaching ($500+) + Landing pages ($100+) + Social ($50+) + Voice ($200+) = $1,460+/mo. RealtyGrind replaces ALL of it. Starting at $49/mo.',
+    tags:'#SaveMoney #ROI #TechStack #RealEstateBudget #AllInOne' },
+
+  { day:28, week:4, layout:'card', badge:'RESULTS', headline:'"40% GCI Increase"', sub:'Real results from agents using agentic AI to close more deals with less admin work.', img:1,
+    caption:'More AI follow-ups → More touches → More consistency → More closings. It\'s not magic, it\'s math. RealtyGrind agents are reporting dramatic production increases with dramatically less time on admin.',
+    tags:'#Results #GCI #AgentSuccess #Testimonial #ClosingDeals' },
+
+  { day:29, week:4, layout:'dark', badge:'THE FUTURE', headline:'The Future of\nReal Estate is Agentic', sub:'AI that doesn\'t just advise.\nAI that reads your CRM and executes on your behalf.', img:14,
+    caption:'Chatbots give advice. Agentic AI does the work. It doesn\'t just tell you to follow up — it writes the email. It doesn\'t just suggest a schedule — it builds your week. The agents who adopt this first will dominate.',
+    tags:'#FutureOfRealEstate #AgenticAI #Innovation #PropTech #AIRevolution' },
+
+  { day:30, week:4, layout:'hero', badge:'JOIN NOW', headline:'Your Grind.\nSupercharged.', sub:'Every feature. Every AI tool. One platform.\nStart your free trial today.', img:6,
+    caption:'CoachAI. WeekAI. DeckAI. ValueAI. PlannerAI. GraphicAI. ListingCraft. AI SDR. AI Blog Writer. AI Chatbots. AI Guides. Landing Pages. Drip Campaigns. Workflow Automation. Voice Suite. Direct Mail. All in one. Start free → realtygrind.co',
+    tags:'#RealtyGrind #YourGrindSupercharged #StartToday #FreeTrial #RealEstateAI' },
+
+  // ── BONUS: MEET THE FOUNDERS ──
+  { day:31, week:5, layout:'founder', badge:'MEET THE FOUNDER', headline:'Derik Bannister', role:'CEO & Founder', img:0,
+    headshot:'team/derik.jpg',
+    bio:'A former agent who got tired of drowning in disconnected tools. Derik built RealtyGrind because he believed agents deserve a platform that actually does the work — not just another dashboard to stare at.',
+    caption:'Meet Derik Bannister — CEO & Founder of RealtyGrind. A former real estate agent who lived the pain of juggling 10+ tools and decided to fix it. He built the first Agentic AI Operating System for real estate — one platform that doesn\'t just organize your data, it actually does the work.',
+    tags:'#MeetTheFounder #RealtyGrind #Startup #RealEstateTech #CEO #PropTech #FounderStory' },
+
+  { day:32, week:5, layout:'founder', badge:'MEET THE TEAM', headline:'Daniel Gandee', role:'Chief Revenue Officer', img:1,
+    headshot:'team/dan.webp',
+    bio:'Daniel drives revenue growth, strategic partnerships, and market expansion. His mission: get RealtyGrind into the hands of every agent and brokerage that needs it.',
+    caption:'Meet Daniel Gandee — Chief Revenue Officer at RealtyGrind. Daniel is the driving force behind our growth strategy and partnerships. His mission is simple: get RealtyGrind into the hands of every agent and brokerage that needs it. Strategic. Relentless. Results-driven.',
+    tags:'#MeetTheTeam #RealtyGrind #CRO #RevenueGrowth #Partnerships #RealEstateTech' },
+
+  { day:33, week:5, layout:'founder', badge:'MEET THE TEAM', headline:'Ed Zulyevic', role:'Chief Operating Officer', img:2,
+    headshot:'team/ed.webp',
+    bio:'Ed keeps the engine running. From product delivery to day-to-day operations, he makes sure every feature ships on time and every customer experience is seamless.',
+    caption:'Meet Ed Zulyevic — Chief Operating Officer at RealtyGrind. Ed is the operational backbone of our platform. From product delivery to customer experience, he makes sure every feature ships on time and every user gets the premium experience they deserve.',
+    tags:'#MeetTheTeam #RealtyGrind #COO #Operations #ProductDelivery #StartupLife' },
+]
+
+// ── Render Functions ─────────────────────────────────────────────────
+
+function logo(size) {
+  const s = Math.round(size)
+  return `<div style="display:flex;align-items:center;gap:${Math.round(s*0.4)}px">
+    <div style="width:${s}px;height:${s}px;border-radius:${Math.round(s*0.25)}px;background:rgba(124,58,237,.9);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(167,139,250,.3)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:${Math.round(s*0.55)}px;height:${Math.round(s*0.55)}px"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    </div>
+    <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:${Math.round(s*0.65)}px;color:white;letter-spacing:-.01em">RealtyGrind</span>
+  </div>`
+}
+
+function badge(text, w) {
+  const fs = Math.round(w * 0.012)
+  return `<div style="display:inline-block;padding:${Math.round(fs*0.5)}px ${Math.round(fs*1.2)}px;border-radius:${Math.round(fs*2)}px;background:rgba(124,58,237,.25);border:1px solid rgba(167,139,250,.3);font-size:${Math.max(fs,10)}px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#c4b5fd;font-family:'Inter',sans-serif;backdrop-filter:blur(4px)">${text}</div>`
+}
+
+function ctaBar(w) {
+  const fs = Math.round(w * 0.014)
+  return `<div style="display:flex;align-items:center;gap:${Math.round(fs*0.6)}px;margin-top:${Math.round(w*0.02)}px">
+    <div style="width:${Math.round(fs*0.5)}px;height:${Math.round(fs*0.5)}px;border-radius:50%;background:#a855f7;box-shadow:0 0 12px rgba(168,85,247,.6)"></div>
+    <span style="font-size:${Math.max(fs,11)}px;font-weight:700;color:#c4b5fd;letter-spacing:1px;font-family:'Inter',sans-serif">realtygrind.co</span>
+  </div>`
+}
+
+// ── HERO LAYOUT ──
+function renderHero(data, w, h) {
+  const pad = Math.round(w * 0.065)
+  const headFS = Math.round(w * 0.054)
+  const subFS = Math.round(w * 0.017)
+  const logoS = Math.round(w * 0.032)
+  const isLandscape = w/h > 1.4
+  const justify = isLandscape ? 'center' : 'flex-end'
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif">
+    <img src="${imgUrl(data.img, w)}" crossorigin="anonymous" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(8,0,26,.95) 0%,rgba(59,7,100,.88) 40%,rgba(124,58,237,.72) 100%)"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;justify-content:${justify}">
+      <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="${isLandscape ? 'max-width:65%' : ''}">
+        <div style="margin-bottom:${Math.round(w*0.018)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.08;margin:0 0 ${Math.round(w*0.018)}px;letter-spacing:-.02em;white-space:pre-line">${data.headline}</h1>
+        <p style="font-family:'Poppins',sans-serif;font-size:${subFS}px;font-weight:500;color:rgba(196,181,253,.85);line-height:1.6;margin:0;max-width:${Math.round(w*0.75)}px;white-space:pre-line">${data.sub}</p>
+        ${ctaBar(w)}
+      </div>
+    </div>
+  </div>`
+}
+
+// ── SPLIT LAYOUT ──
+function renderSplit(data, w, h) {
+  const pad = Math.round(w * 0.055)
+  const headFS = Math.round(w * 0.046)
+  const subFS = Math.round(w * 0.015)
+  const logoS = Math.round(w * 0.028)
+  const isPortrait = h > w
+  const splitDir = isPortrait ? 'column' : 'row'
+  const textW = isPortrait ? '100%' : '55%'
+  const imgW = isPortrait ? '100%' : '45%'
+  const textH = isPortrait ? '60%' : '100%'
+  const imgH = isPortrait ? '40%' : '100%'
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;display:flex;flex-direction:${splitDir}">
+    <div style="width:${textW};height:${textH};background:linear-gradient(160deg,#08001a 0%,#1a0544 50%,#2e1065 100%);padding:${pad}px;display:flex;flex-direction:column;justify-content:center;position:relative">
+      <div style="position:absolute;top:${Math.round(pad*0.7)}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="margin-top:${Math.round(w*0.04)}px">
+        <div style="margin-bottom:${Math.round(w*0.015)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.1;margin:0 0 ${Math.round(w*0.015)}px;letter-spacing:-.02em;white-space:pre-line">${data.headline}</h1>
+        <p style="font-family:'Poppins',sans-serif;font-size:${subFS}px;font-weight:500;color:rgba(196,181,253,.75);line-height:1.65;margin:0;white-space:pre-line">${data.sub}</p>
+        ${ctaBar(w)}
+      </div>
+    </div>
+    <div style="width:${imgW};height:${imgH};position:relative;overflow:hidden">
+      <img src="${imgUrl(data.img, w)}" crossorigin="anonymous" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+      <div style="position:absolute;inset:0;background:linear-gradient(${isPortrait ? '0deg' : '90deg'},rgba(8,0,26,.6) 0%,transparent 50%)"></div>
+    </div>
+  </div>`
+}
+
+// ── DARK LAYOUT ──
+function renderDark(data, w, h) {
+  const pad = Math.round(w * 0.07)
+  const headFS = Math.round(w * 0.052)
+  const subFS = Math.round(w * 0.016)
+  const logoS = Math.round(w * 0.03)
+  const glowSize = Math.round(w * 0.6)
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:#06001a">
+    <div style="position:absolute;top:${h > w ? '30%' : '50%'};left:50%;transform:translate(-50%,-50%);width:${glowSize}px;height:${glowSize}px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.2) 0%,rgba(59,7,100,.08) 50%,transparent 70%);filter:blur(${Math.round(w*0.05)}px)"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:${Math.round(h*0.3)}px;background:linear-gradient(0deg,rgba(124,58,237,.06),transparent)"></div>
+    <div style="position:absolute;inset:0;border:1px solid rgba(124,58,237,.08)"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;justify-content:center">
+      <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="max-width:${Math.round(w*0.85)}px;margin-top:${Math.round(w*0.02)}px">
+        <div style="margin-bottom:${Math.round(w*0.018)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.1;margin:0 0 ${Math.round(w*0.02)}px;letter-spacing:-.02em;white-space:pre-line">${data.headline}</h1>
+        <p style="font-family:'Poppins',sans-serif;font-size:${subFS}px;font-weight:500;color:rgba(196,181,253,.65);line-height:1.7;margin:0;max-width:${Math.round(w*0.7)}px;white-space:pre-line">${data.sub}</p>
+        ${ctaBar(w)}
+      </div>
+    </div>
+  </div>`
+}
+
+// ── CARD LAYOUT ──
+function renderCard(data, w, h) {
+  const pad = Math.round(w * 0.06)
+  const headFS = Math.round(w * 0.044)
+  const subFS = Math.round(w * 0.014)
+  const logoS = Math.round(w * 0.028)
+  const cardPad = Math.round(w * 0.04)
+  const isLandscape = w/h > 1.4
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif">
+    <img src="${imgUrl(data.img, w)}" crossorigin="anonymous" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(8,0,26,.85),rgba(59,7,100,.7),rgba(8,0,26,.85))"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;justify-content:center;${isLandscape?'align-items:flex-start':'align-items:center'}">
+      <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="background:rgba(8,0,26,.65);border:1px solid rgba(124,58,237,.25);border-radius:${Math.round(w*0.022)}px;padding:${cardPad}px;max-width:${isLandscape?Math.round(w*0.6)+'px':Math.round(w*0.88)+'px'};backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 ${Math.round(w*0.02)}px ${Math.round(w*0.06)}px rgba(0,0,0,.4),inset 0 1px 0 rgba(167,139,250,.1)">
+        <div style="margin-bottom:${Math.round(w*0.015)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.1;margin:0 0 ${Math.round(w*0.015)}px;letter-spacing:-.02em;white-space:pre-line">${data.headline}</h1>
+        <p style="font-family:'Poppins',sans-serif;font-size:${subFS}px;font-weight:500;color:rgba(196,181,253,.75);line-height:1.65;margin:0;white-space:pre-line">${data.sub}</p>
+        ${ctaBar(w)}
+      </div>
+    </div>
+  </div>`
+}
+
+// ── GRADIENT LAYOUT ──
+function renderGradient(data, w, h) {
+  const pad = Math.round(w * 0.08)
+  const headFS = Math.round(w * 0.042)
+  const subFS = Math.round(w * 0.014)
+  const logoS = Math.round(w * 0.032)
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:linear-gradient(160deg,#08001a 0%,#1a0544 25%,#3b0764 50%,#7c3aed 85%,#a78bfa 100%)">
+    <div style="position:absolute;top:20%;right:-10%;width:${Math.round(w*0.6)}px;height:${Math.round(w*0.6)}px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.15),transparent 70%);filter:blur(${Math.round(w*0.08)}px)"></div>
+    <div style="position:absolute;bottom:-10%;left:-10%;width:${Math.round(w*0.5)}px;height:${Math.round(w*0.5)}px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);filter:blur(${Math.round(w*0.06)}px)"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div style="position:absolute;top:${Math.round(pad*0.6)}px;left:${Math.round(pad*0.6)}px">${logo(logoS)}</div>
+      <div style="width:100%;max-width:${Math.round(w*0.84)}px">
+        <div style="margin-bottom:${Math.round(w*0.02)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.12;margin:0 0 ${Math.round(w*0.02)}px;letter-spacing:-.02em;white-space:pre-line;word-wrap:break-word;overflow-wrap:break-word">${data.headline}</h1>
+        <p style="font-family:'Poppins',sans-serif;font-size:${subFS}px;font-weight:500;color:rgba(255,255,255,.7);line-height:1.7;margin:0;white-space:pre-line">${data.sub}</p>
+        <div style="display:flex;justify-content:center">${ctaBar(w)}</div>
+      </div>
+    </div>
+  </div>`
+}
+
+// ── LIST LAYOUT ──
+function renderList(data, w, h) {
+  const pad = Math.round(w * 0.065)
+  const headFS = Math.round(w * 0.046)
+  const itemFS = Math.round(w * 0.017)
+  const logoS = Math.round(w * 0.03)
+  const numSize = Math.round(w * 0.04)
+  const items = data.items || []
+
+  const itemsHTML = items.map((item, i) => `
+    <div style="display:flex;align-items:flex-start;gap:${Math.round(w*0.015)}px;padding:${Math.round(w*0.012)}px 0;${i < items.length-1 ? `border-bottom:1px solid rgba(167,139,250,.12)` : ''}">
+      <div style="width:${numSize}px;height:${numSize}px;border-radius:${Math.round(numSize*0.3)}px;background:rgba(124,58,237,.2);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:${Math.round(numSize*0.45)}px;color:#a78bfa;flex-shrink:0">${i+1}</div>
+      <span style="font-family:'Poppins',sans-serif;font-size:${itemFS}px;font-weight:500;color:rgba(226,217,243,.85);line-height:1.5;padding-top:${Math.round(numSize*0.15)}px">${item}</span>
+    </div>
+  `).join('')
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:linear-gradient(160deg,#08001a 0%,#13003a 40%,#2e1065 100%)">
+    <div style="position:absolute;top:30%;right:0;width:${Math.round(w*0.4)}px;height:${Math.round(w*0.4)}px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1),transparent 70%);filter:blur(${Math.round(w*0.06)}px)"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;justify-content:center">
+      <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="margin-top:${Math.round(w*0.02)}px">
+        <div style="margin-bottom:${Math.round(w*0.015)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.1;margin:0 0 ${Math.round(w*0.025)}px;letter-spacing:-.02em;white-space:pre-line">${data.headline}</h1>
+        <div style="max-width:${Math.round(w*0.82)}px">${itemsHTML}</div>
+        ${ctaBar(w)}
+      </div>
+    </div>
+  </div>`
+}
+
+// ── FOUNDER LAYOUT ──
+function renderFounder(data, w, h) {
+  const pad = Math.round(w * 0.06)
+  const headFS = Math.round(w * 0.052)
+  const roleFS = Math.round(w * 0.018)
+  const bioFS = Math.round(w * 0.015)
+  const logoS = Math.round(w * 0.028)
+  const isPortrait = h > w
+  const isLandscape = w / h > 1.4
+
+  const headshotSize = isPortrait ? Math.round(w * 0.42) : isLandscape ? Math.round(h * 0.55) : Math.round(w * 0.36)
+  const ringWidth = Math.round(headshotSize * 0.025)
+  const ringGap = Math.round(headshotSize * 0.02)
+  const totalRing = headshotSize + (ringWidth + ringGap) * 2
+
+  if (isLandscape) {
+    return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#08001a 0%,#13003a 35%,#2e1065 70%,#3b0764 100%)">
+      <div style="position:absolute;top:-15%;right:15%;width:${Math.round(w*0.4)}px;height:${Math.round(w*0.4)}px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12),transparent 70%);filter:blur(${Math.round(w*0.06)}px)"></div>
+      <div style="position:absolute;bottom:-20%;left:30%;width:${Math.round(w*0.35)}px;height:${Math.round(w*0.35)}px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.08),transparent 70%);filter:blur(${Math.round(w*0.05)}px)"></div>
+      <div style="position:absolute;inset:0;padding:${pad}px;display:flex;align-items:center;gap:${Math.round(w*0.05)}px">
+        <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:${Math.round(w*0.03)}px">
+          <div style="width:${totalRing}px;height:${totalRing}px;border-radius:50%;background:conic-gradient(from 0deg,#7c3aed,#a855f7,#c4b5fd,#a855f7,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 0 ${Math.round(w*0.04)}px rgba(124,58,237,.35)">
+            <div style="width:${headshotSize + ringGap*2}px;height:${headshotSize + ringGap*2}px;border-radius:50%;background:#08001a;display:flex;align-items:center;justify-content:center">
+              <img src="${data.headshot}" crossorigin="anonymous" style="width:${headshotSize}px;height:${headshotSize}px;border-radius:50%;object-fit:cover;object-position:center 15%;display:block" />
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="margin-bottom:${Math.round(w*0.012)}px">${badge(data.badge, w)}</div>
+          <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.08;margin:0;letter-spacing:-.02em">${data.headline}</h1>
+          <div style="font-family:'Poppins',sans-serif;font-size:${roleFS}px;font-weight:700;color:#a78bfa;margin:${Math.round(w*0.008)}px 0 ${Math.round(w*0.015)}px;letter-spacing:1px;text-transform:uppercase">${data.role}</div>
+          <div style="width:${Math.round(w*0.05)}px;height:2px;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:2px;margin-bottom:${Math.round(w*0.012)}px"></div>
+          <p style="font-family:'Poppins',sans-serif;font-size:${bioFS}px;font-weight:400;color:rgba(196,181,253,.8);line-height:1.7;margin:0">${data.bio}</p>
+          ${ctaBar(w)}
+        </div>
+      </div>
+    </div>`
+  }
+
+  const photoTop = isPortrait ? Math.round(h * 0.12) : Math.round(h * 0.08)
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:linear-gradient(160deg,#08001a 0%,#13003a 30%,#2e1065 65%,#3b0764 100%)">
+    <div style="position:absolute;top:10%;right:-15%;width:${Math.round(w*0.5)}px;height:${Math.round(w*0.5)}px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12),transparent 70%);filter:blur(${Math.round(w*0.06)}px)"></div>
+    <div style="position:absolute;bottom:10%;left:-10%;width:${Math.round(w*0.4)}px;height:${Math.round(w*0.4)}px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.08),transparent 70%);filter:blur(${Math.round(w*0.05)}px)"></div>
+    <div style="position:absolute;inset:0;padding:${pad}px;display:flex;flex-direction:column;align-items:center">
+      <div style="position:absolute;top:${pad}px;left:${pad}px">${logo(logoS)}</div>
+      <div style="margin-top:${photoTop}px;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%">
+        <div style="width:${totalRing}px;height:${totalRing}px;border-radius:50%;background:conic-gradient(from 0deg,#7c3aed,#a855f7,#c4b5fd,#a855f7,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 0 ${Math.round(w*0.05)}px rgba(124,58,237,.35);margin-bottom:${Math.round(w*0.03)}px">
+          <div style="width:${headshotSize + ringGap*2}px;height:${headshotSize + ringGap*2}px;border-radius:50%;background:#08001a;display:flex;align-items:center;justify-content:center">
+            <img src="${data.headshot}" crossorigin="anonymous" style="width:${headshotSize}px;height:${headshotSize}px;border-radius:50%;object-fit:cover;object-position:center 15%;display:block" />
+          </div>
+        </div>
+        <div style="margin-bottom:${Math.round(w*0.012)}px">${badge(data.badge, w)}</div>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:${headFS}px;font-weight:900;color:white;line-height:1.08;margin:0;letter-spacing:-.02em">${data.headline}</h1>
+        <div style="font-family:'Poppins',sans-serif;font-size:${roleFS}px;font-weight:700;color:#a78bfa;margin:${Math.round(w*0.008)}px 0 ${Math.round(w*0.015)}px;letter-spacing:1px;text-transform:uppercase">${data.role}</div>
+        <div style="width:${Math.round(w*0.06)}px;height:2px;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:2px;margin-bottom:${Math.round(w*0.015)}px"></div>
+        <p style="font-family:'Poppins',sans-serif;font-size:${bioFS}px;font-weight:400;color:rgba(196,181,253,.8);line-height:1.7;margin:0;max-width:${Math.round(w*0.82)}px;text-align:center">${data.bio}</p>
+        <div style="margin-top:${Math.round(w*0.015)}px">${ctaBar(w)}</div>
+      </div>
+    </div>
+  </div>`
+}
+
+// ── Master render ──
+function renderGraphic(data, sizeKey) {
+  const { w, h } = SIZES[sizeKey]
+  switch(data.layout) {
+    case 'hero': return renderHero(data, w, h)
+    case 'split': return renderSplit(data, w, h)
+    case 'dark': return renderDark(data, w, h)
+    case 'card': return renderCard(data, w, h)
+    case 'gradient': return renderGradient(data, w, h)
+    case 'list': return renderList(data, w, h)
+    case 'founder': return renderFounder(data, w, h)
+    default: return renderHero(data, w, h)
+  }
+}
+
+// ── App State ────────────────────────────────────────────────────────
+let selectedDay = 0
+let selectedSize = 'square'
+
+function toast(msg) {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 2500)
+}
+
+// ── Download ─────────────────────────────────────────────────────────
+async function downloadGraphic(dayIdx, sizeKey) {
+  const { w, h } = SIZES[sizeKey]
+  const target = document.getElementById('renderTarget')
+  target.innerHTML = renderGraphic(DAYS[dayIdx], sizeKey)
+  const el = target.firstElementChild
+
+  await new Promise(r => setTimeout(r, 500))
+  await new Promise(r => {
+    const imgs = el.querySelectorAll('img')
+    if (!imgs.length) return r()
+    let loaded = 0
+    imgs.forEach(img => {
+      if (img.complete) { loaded++; if (loaded === imgs.length) r() }
+      else { img.onload = img.onerror = () => { loaded++; if (loaded === imgs.length) r() } }
+    })
+  })
+
+  try {
+    const canvas = await html2canvas(el, {
+      width: w, height: h, scale: 1,
+      useCORS: true, allowTaint: false,
+      backgroundColor: '#08001a',
+      logging: false,
+    })
+    const link = document.createElement('a')
+    link.download = `realtygrind-day${DAYS[dayIdx].day}-${sizeKey}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+    return true
+  } catch (e) {
+    console.error('Export error:', e)
+    toast('Export failed — try right-clicking the preview to save')
+    return false
+  }
+}
+
+async function downloadAllSizes(dayIdx) {
+  const btn = document.getElementById('dlAllBtn')
+  if (btn) { btn.disabled = true; btn.textContent = 'Exporting...' }
+  const keys = Object.keys(SIZES)
+  for (let i = 0; i < keys.length; i++) {
+    const pct = Math.round(((i + 1) / keys.length) * 100)
+    const fill = document.getElementById('progressFill')
+    if (fill) fill.style.width = pct + '%'
+    await downloadGraphic(dayIdx, keys[i])
+    await new Promise(r => setTimeout(r, 300))
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '⬇ Download All 4 Sizes' }
+  toast(`All 4 sizes downloaded for Day ${DAYS[dayIdx].day}!`)
+}
+
+async function downloadEverything() {
+  const btn = document.getElementById('dlEverythingBtn')
+  if (btn) { btn.disabled = true; btn.textContent = 'Exporting all 120 graphics...' }
+  const keys = Object.keys(SIZES)
+  const total = DAYS.length * keys.length
+  let done = 0
+  for (let d = 0; d < DAYS.length; d++) {
+    for (let s = 0; s < keys.length; s++) {
+      await downloadGraphic(d, keys[s])
+      done++
+      const fill = document.getElementById('progressFillAll')
+      if (fill) fill.style.width = Math.round((done/total)*100) + '%'
+      await new Promise(r => setTimeout(r, 200))
+    }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '⬇ Download ALL 120 Graphics' }
+  toast('All 120 graphics downloaded!')
+}
+
+// ── Render App ───────────────────────────────────────────────────────
+function renderApp() {
+  // Sidebar
+  const dayList = document.getElementById('dayList')
+  let listHTML = ''
+  let currentWeek = 0
+  const weekNames = ['','Week 1 · Introduce','Week 2 · Productivity','Week 3 · Marketing','Week 4 · Advanced','Bonus · Meet the Team']
+  DAYS.forEach((d, i) => {
+    if (d.week !== currentWeek) {
+      currentWeek = d.week
+      listHTML += `<div class="week-divider">${weekNames[d.week]}</div>`
+    }
+    const shortTitle = d.headline.split('\n')[0].substring(0, 24)
+    listHTML += `<div class="day-item${i===selectedDay?' active':''}" onclick="selectDay(${i})">
+      <div class="day-num">${d.day}</div>
+      <div class="day-label"><strong>${shortTitle}</strong><small>${d.badge}</small></div>
+    </div>`
+  })
+  dayList.innerHTML = listHTML
+
+  // Main
+  const data = DAYS[selectedDay]
+  const { w, h } = SIZES[selectedSize]
+  const viewW = window.innerWidth < 900 ? window.innerWidth - 80 : window.innerWidth - 380
+  const maxW = Math.min(w, Math.min(680, viewW))
+  const displayScale = maxW / w
+  const displayH = Math.round(h * displayScale)
+
+  const sizeTabs = Object.entries(SIZES).map(([key, s]) =>
+    `<button class="size-tab${key===selectedSize?' active':''}" onclick="selectSize('${key}')">${s.label.split('(')[0].trim()}</button>`
+  ).join('')
+
+  document.getElementById('main').innerHTML = `
+    <div class="main-header">
+      <div>
+        <div class="main-title">Day ${data.day} — ${data.headline.split('\\n')[0]}</div>
+      </div>
+      <div class="size-tabs">${sizeTabs}</div>
+    </div>
+
+    <div class="preview-wrapper">
+      <div class="preview-container" style="width:${maxW}px;height:${displayH}px">
+        <div style="transform:scale(${displayScale});transform-origin:top left;width:${w}px;height:${h}px">
+          ${renderGraphic(data, selectedSize)}
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="dl-btn primary" onclick="downloadGraphic(${selectedDay},'${selectedSize}')">⬇ Download ${SIZES[selectedSize].label.split('(')[0].trim()}</button>
+      <button class="dl-btn secondary" id="dlAllBtn" onclick="downloadAllSizes(${selectedDay})">⬇ Download All 4 Sizes</button>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0"></div></div>
+
+    <div class="caption-section">
+      <div class="caption-label">Post Caption</div>
+      <div class="caption-text">${data.caption}</div>
+      <div class="hashtags">${data.tags}</div>
+      <button class="copy-btn" onclick="copyCaption(${selectedDay})">📋 Copy Caption + Hashtags</button>
+    </div>
+
+    <div class="dl-all-section">
+      <button class="dl-all-btn" id="dlEverythingBtn" onclick="downloadEverything()">⬇ Download ALL ${DAYS.length * 4} Graphics (${DAYS.length} days × 4 sizes)</button>
+      <div class="progress-bar" style="margin-top:8px;max-width:400px;margin-left:auto;margin-right:auto"><div class="progress-fill" id="progressFillAll" style="width:0"></div></div>
+    </div>
+  `
+}
+
+function selectDay(idx) {
+  selectedDay = idx
+  renderApp()
+  document.querySelector('.day-item.active')?.scrollIntoView({ block: 'nearest' })
+}
+
+function selectSize(key) {
+  selectedSize = key
+  renderApp()
+}
+
+function copyCaption(idx) {
+  const d = DAYS[idx]
+  navigator.clipboard.writeText(d.caption + '\n\n' + d.tags).then(() => toast('Caption copied!'))
+}
+
+// ── Init ─────────────────────────────────────────────────────────────
+renderApp()
+</script>
+</body>
+</html>
