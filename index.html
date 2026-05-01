@@ -8,11 +8,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#08001a;color:#e2d9f3;font-family:'Inter',sans-serif;min-height:100vh}
+html,body{height:100%}
+body{background:#08001a;color:#e2d9f3;font-family:'Inter',sans-serif;overflow:hidden}
 
 /* ── App Layout ── */
-.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-.sidebar{background:#0d0024;border-right:1px solid rgba(124,58,237,.15);overflow-y:auto;padding:20px 0}
+.app{display:grid;grid-template-columns:280px 1fr;height:100vh;overflow:hidden}
+.sidebar{background:#0d0024;border-right:1px solid rgba(124,58,237,.15);overflow-y:auto;padding:20px 0;height:100vh}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:6px}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,.4)}
 .sidebar-header{padding:0 20px 20px;border-bottom:1px solid rgba(124,58,237,.1);margin-bottom:12px}
 .sidebar-logo{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .sidebar-logo svg{width:24px;height:24px;color:#a78bfa}
@@ -34,8 +39,13 @@ body{background:#08001a;color:#e2d9f3;font-family:'Inter',sans-serif;min-height:
 .week-divider{padding:16px 20px 6px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(124,58,237,.4)}
 
 /* ── Main Content ── */
-.main{padding:28px 36px;overflow-y:auto}
-.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.main{padding:28px 36px;overflow-y:auto;height:100vh}
+.main::-webkit-scrollbar{width:8px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:8px}
+.main::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,.4)}
+.main-sticky{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#08001a 0%,#08001a 92%,rgba(8,0,26,.8) 100%);padding-bottom:8px;margin:-28px -36px 0;padding:28px 36px 12px}
+.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
 .main-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:22px;color:#fff}
 
 /* Size tabs */
@@ -1004,17 +1014,19 @@ function renderApp() {
   ).join('')
 
   document.getElementById('main').innerHTML = `
-    <div class="main-header">
-      <div>
-        <div class="main-title">Day ${data.day} — ${dayTitle(data)}</div>
+    <div class="main-sticky">
+      <div class="main-header">
+        <div>
+          <div class="main-title">Day ${data.day} — ${dayTitle(data)}</div>
+        </div>
+        <div class="size-tabs">${sizeTabs}</div>
       </div>
-      <div class="size-tabs">${sizeTabs}</div>
-    </div>
 
-    <div class="preview-wrapper">
-      <div class="preview-container" style="width:${maxW}px;height:${displayH}px">
-        <div style="transform:scale(${displayScale});transform-origin:top left;width:${w}px;height:${h}px">
-          ${renderGraphic(data, selectedSize)}
+      <div class="preview-wrapper" style="padding:8px 0">
+        <div class="preview-container" style="width:${maxW}px;height:${displayH}px">
+          <div style="transform:scale(${displayScale});transform-origin:top left;width:${w}px;height:${h}px">
+            ${renderGraphic(data, selectedSize)}
+          </div>
         </div>
       </div>
     </div>
