@@ -1213,6 +1213,31 @@ const DAYS = [
   { day:200, week:40, layout:'manifesto', badge:'🚀 LAUNCHED', headline:'You\'re In.', sub:'Beta seat claimed. AI configured. Onboarding scheduled.\n\nThis is day one of the agent you were always meant to be.\nLet\'s go. → realtygrind.co',
     caption:'Day 200 of the launch campaign. Day 1 of your new business. RealtyGrind is yours. Lock in. Let\'s build the rest of your career — together. — Derik. → realtygrind.co',
     tags:'#YouAreIn #Day1 #LaunchedAgent #FoundingMember #LetsGo' },
+
+  // ── BONUS: 🎯 PROFILE PHOTOS & BRAND ASSETS ──
+  { day:201, week:41, layout:'profile', badge:'PROFILE PHOTO', name:'Icon Mark · Gradient', variant:'icon', bgVariant:'gradient',
+    caption:'Your primary RealtyGrind profile photo — Lucide home icon centered on the brand purple gradient. Circle-crop safe. Use on Instagram, LinkedIn, Facebook, Twitter/X, YouTube, TikTok. → realtygrind.co',
+    tags:'#ProfilePhoto #BrandAssets #RealtyGrind #LogoMark' },
+
+  { day:202, week:41, layout:'profile', badge:'PROFILE PHOTO', name:'Icon Mark · Dark', variant:'icon', bgVariant:'dark',
+    caption:'Dark variant profile photo — Lucide home icon on a deep purple radial. For platforms where a darker logo reads better against light feeds. → realtygrind.co',
+    tags:'#ProfilePhoto #BrandAssets #DarkVariant #LogoMark' },
+
+  { day:203, week:41, layout:'profile', badge:'PROFILE PHOTO', name:'Icon Mark · Flat', variant:'icon', bgVariant:'flat',
+    caption:'Flat purple variant — pure #7c3aed background, white icon. Ultra-clean for favicons and tiny avatars where gradients muddy. → realtygrind.co',
+    tags:'#ProfilePhoto #BrandAssets #FlatVariant #Favicon' },
+
+  { day:204, week:41, layout:'profile', badge:'PROFILE PHOTO', name:'RG Monogram · Gradient', variant:'monogram', bgVariant:'gradient',
+    caption:'RG monogram profile — bold "RG" letters on the brand gradient. For when you want letterform recognition over the icon. → realtygrind.co',
+    tags:'#ProfilePhoto #BrandAssets #Monogram #RG' },
+
+  { day:205, week:41, layout:'profile', badge:'PROFILE PHOTO', name:'Stacked Logo · Gradient', variant:'stacked', bgVariant:'gradient',
+    caption:'Stacked logo profile — icon on top, "RealtyGrind" wordmark below. Use where the platform crops square (not circle), like Twitter/X header thumbnails. → realtygrind.co',
+    tags:'#ProfilePhoto #BrandAssets #StackedLogo #Wordmark' },
+
+  { day:206, week:41, layout:'profile', badge:'BANNER ASSET', name:'Horizontal Wordmark · Gradient', variant:'horizontal', bgVariant:'gradient',
+    caption:'Horizontal wordmark — icon + RealtyGrind side by side. Best at landscape size (1200×628 or 1600×900) for cover photos: LinkedIn cover, Facebook cover, Twitter header. → realtygrind.co',
+    tags:'#CoverPhoto #BrandAssets #Banner #LinkedInCover #FacebookCover' },
 ]
 
 // ── Render Functions ─────────────────────────────────────────────────
@@ -1581,6 +1606,60 @@ function renderPersona(data, w, h) {
   </div>`
 }
 
+// ── PROFILE LAYOUT — Square, circle-crop-safe profile photo ──
+function renderProfile(data, w, h) {
+  const variant = data.variant || 'icon'
+  const size = Math.min(w, h)
+  const inset = Math.round(size * 0.04)
+  const safeRadius = Math.round((size - inset * 2) / 2)
+
+  // Background variants
+  const bg = data.bgVariant === 'flat'
+    ? '#7c3aed'
+    : data.bgVariant === 'dark'
+    ? 'radial-gradient(circle at center,#3b0764 0%,#1a0544 60%,#08001a 100%)'
+    : 'radial-gradient(circle at 30% 30%,#a855f7 0%,#7c3aed 35%,#3b0764 80%,#1a0544 100%)'
+
+  let inner = ''
+  if (variant === 'icon') {
+    // Big Lucide home icon centered
+    const iconSize = Math.round(size * 0.42)
+    inner = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:${iconSize}px;height:${iconSize}px;filter:drop-shadow(0 ${Math.round(size*0.01)}px ${Math.round(size*0.02)}px rgba(0,0,0,.3))"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`
+  } else if (variant === 'monogram') {
+    // "RG" monogram
+    const fs = Math.round(size * 0.36)
+    inner = `<div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:${fs}px;color:white;letter-spacing:-.04em;line-height:.9;text-shadow:0 ${Math.round(size*0.008)}px ${Math.round(size*0.02)}px rgba(0,0,0,.3)">RG</div>`
+  } else if (variant === 'stacked') {
+    // Icon on top, "RealtyGrind" below
+    const iconSize = Math.round(size * 0.32)
+    const fs = Math.round(size * 0.085)
+    inner = `<div style="display:flex;flex-direction:column;align-items:center;gap:${Math.round(size*0.025)}px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:${iconSize}px;height:${iconSize}px;filter:drop-shadow(0 ${Math.round(size*0.008)}px ${Math.round(size*0.02)}px rgba(0,0,0,.3))"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:${fs}px;color:white;letter-spacing:-.015em">RealtyGrind</div>
+    </div>`
+  } else if (variant === 'horizontal') {
+    // Icon left, wordmark right (cover photo style)
+    const iconSize = Math.round(size * 0.28)
+    const fs = Math.round(size * 0.16)
+    inner = `<div style="display:flex;align-items:center;gap:${Math.round(size*0.025)}px">
+      <div style="width:${Math.round(iconSize*1.4)}px;height:${Math.round(iconSize*1.4)}px;border-radius:${Math.round(iconSize*0.32)}px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:${iconSize}px;height:${iconSize}px"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:${fs}px;color:white;letter-spacing:-.025em">RealtyGrind</div>
+    </div>`
+  }
+
+  // Soft inner glow ring (helps circle crop look intentional)
+  const glow = data.bgVariant === 'flat' ? '' : `<div style="position:absolute;inset:${Math.round(size*0.06)}px;border-radius:50%;background:radial-gradient(circle,transparent 60%,rgba(255,255,255,.04) 75%,transparent 90%);pointer-events:none"></div>`
+
+  return `<div style="position:relative;width:${w}px;height:${h}px;overflow:hidden;font-family:'Inter',sans-serif;background:${bg};display:flex;align-items:center;justify-content:center">
+    ${glow}
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+      ${inner}
+    </div>
+  </div>`
+}
+
 // ── MOCKUP LAYOUT — UI/UX showcase with realistic app chrome ──
 function renderMockup(data, w, h) {
   const pad = Math.round(w * 0.05)
@@ -1722,6 +1801,7 @@ function renderGraphic(data, sizeKey) {
     case 'manifesto': return renderManifesto(data, w, h)
     case 'persona': return renderPersona(data, w, h)
     case 'mockup': return renderMockup(data, w, h)
+    case 'profile': return renderProfile(data, w, h)
     default: return renderHero(data, w, h)
   }
 }
@@ -1814,7 +1894,7 @@ function renderApp() {
   const dayList = document.getElementById('dayList')
   let listHTML = ''
   let currentWeek = 0
-  const weekNames = ['','Week 1 · Introduce','Week 2 · Productivity','Week 3 · Marketing','Week 4 · Advanced','Bonus · Meet the Team','Week 6 · Proof & Testimonials','Week 7 · Stats & Math','Week 8 · Versus','Week 9 · Personas','Week 10 · Myths & Manifestos','Week 11 · Quotes','Week 12 · Tactical & Close','Week 13 · 🚀 Beta Launch','Week 14 · 📄 Contract AI','Week 15 · 👥 Seats & Roles','Week 16 · 🔌 MCP Power','Week 17 · ✨ Vibe Building','Week 18 · 💼 Admin Automation','Week 19 · 🎯 Beta Close','Week 20 · 🔗 Public Pages','Week 21 · 🤖 AI SDR + Deals','Week 22 · 📋 Lists & Alerts','Week 23 · 🚀 Agentic Close','Week 24 · 📊 Market Intel','Week 25 · 📞 Scripts & Objections','Week 26 · 🎯 Niche Personas','Week 27 · 🔄 Milestones','Week 28 · 📞 Sphere & Referrals','Week 29 · 🤖 AI Prompt Library','Week 30 · 🌅 Day in the Life','Week 31 · 🧠 Mindset','Week 32 · 🏡 Open Houses','Week 33 · 🎬 Video Content','Week 34 · 📧 Email Mastery','Week 35 · 👥 Brokerage Ops','Week 36 · 🌸 Seasonal','Week 37 · 🎯 Advanced Tactics','Week 38 · 💰 Agent Wealth','Week 39 · ⚖️ Compliance','Week 40 · 🚀 LAUNCH']
+  const weekNames = ['','Week 1 · Introduce','Week 2 · Productivity','Week 3 · Marketing','Week 4 · Advanced','Bonus · Meet the Team','Week 6 · Proof & Testimonials','Week 7 · Stats & Math','Week 8 · Versus','Week 9 · Personas','Week 10 · Myths & Manifestos','Week 11 · Quotes','Week 12 · Tactical & Close','Week 13 · 🚀 Beta Launch','Week 14 · 📄 Contract AI','Week 15 · 👥 Seats & Roles','Week 16 · 🔌 MCP Power','Week 17 · ✨ Vibe Building','Week 18 · 💼 Admin Automation','Week 19 · 🎯 Beta Close','Week 20 · 🔗 Public Pages','Week 21 · 🤖 AI SDR + Deals','Week 22 · 📋 Lists & Alerts','Week 23 · 🚀 Agentic Close','Week 24 · 📊 Market Intel','Week 25 · 📞 Scripts & Objections','Week 26 · 🎯 Niche Personas','Week 27 · 🔄 Milestones','Week 28 · 📞 Sphere & Referrals','Week 29 · 🤖 AI Prompt Library','Week 30 · 🌅 Day in the Life','Week 31 · 🧠 Mindset','Week 32 · 🏡 Open Houses','Week 33 · 🎬 Video Content','Week 34 · 📧 Email Mastery','Week 35 · 👥 Brokerage Ops','Week 36 · 🌸 Seasonal','Week 37 · 🎯 Advanced Tactics','Week 38 · 💰 Agent Wealth','Week 39 · ⚖️ Compliance','Week 40 · 🚀 LAUNCH','Bonus · 🎯 Profile Photos']
   function dayTitle(d) {
     if (d.headline) return d.headline.split('\n')[0]
     if (d.name) return d.name
